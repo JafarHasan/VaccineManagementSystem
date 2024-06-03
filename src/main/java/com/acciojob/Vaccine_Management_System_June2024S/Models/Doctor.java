@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table
 @Data
@@ -28,4 +31,11 @@ public class Doctor {
     private String emailId;
 
     private Integer age;
+
+    @ManyToOne //many DR are available at one centre
+    @JoinColumn(name = "AssociateCentre")
+    private VaccinationCentre vaccinationCentre;
+
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL) //one dcotor can be appointed to man
+    private List<Appointment> appointmentList = new ArrayList<>();
 }

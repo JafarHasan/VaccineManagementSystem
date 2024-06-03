@@ -7,12 +7,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="User")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+
 public class User {
 
     @Id
@@ -31,4 +35,9 @@ public class User {
 
     private String mobileNo;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Dose dose; //bidirectional mapping with dose
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Appointment> appointmentList = new ArrayList<>();
 }

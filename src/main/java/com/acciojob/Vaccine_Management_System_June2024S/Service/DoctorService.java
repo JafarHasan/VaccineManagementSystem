@@ -1,16 +1,26 @@
 package com.acciojob.Vaccine_Management_System_June2024S.Service;
 
+import com.acciojob.Vaccine_Management_System_June2024S.Models.VaccinationCentre;
+import com.acciojob.Vaccine_Management_System_June2024S.Repository.VaccinationCentreRepository;
 import com.acciojob.Vaccine_Management_System_June2024S.Requests.AddDoctorRequest;
 import com.acciojob.Vaccine_Management_System_June2024S.Models.Doctor;
 import com.acciojob.Vaccine_Management_System_June2024S.Repository.DoctorRepository;
+import com.acciojob.Vaccine_Management_System_June2024S.Requests.AssociateDoctorRequest;
+import com.acciojob.Vaccine_Management_System_June2024S.Requests.UpdateDoctorName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.print.Doc;
+import java.util.Optional;
 
 @Service
 public class DoctorService {
 
     @Autowired
     private DoctorRepository doctorRepositoryobj;
+
+    @Autowired
+    private VaccinationCentreRepository vaccinationCentreRepositoryObj;
 
     public String addDoctor(AddDoctorRequest addDoctorRequest){
         Doctor doctor=Doctor.builder().name(addDoctorRequest.getName())
@@ -21,5 +31,53 @@ public class DoctorService {
         doctor=doctorRepositoryobj.save(doctor);
 
         return "Doctor Added with Id ="+doctor.getDoctorId();
+    }
+
+    public String updateDoctorNameById(UpdateDoctorName updateDoctorName) throws Exception{
+        Optional<Doctor> optionalDoctor=doctorRepositoryobj.findById(updateDoctorName.getDoctorId());
+        if(optionalDoctor.isEmpty()){
+            throw new Exception("Invalid Id ,Dr not found!");
+        }
+
+        Doctor doctor=optionalDoctor.get();
+        if(!doctor.getName().equals(updateDoctorName.getOldName())){
+            throw new Exception("Invalid name:"+updateDoctorName.getOldName());
+        }
+
+        doctor.setName(updateDoctorName.getNewName());
+        doctor=doctorRepositoryobj.save(doctor);
+        return "Name updated Successfully!";
+    }
+
+    public String associateDoctorAndCentre(AssociateDoctorRequest associateDoctorRequest) throws Exception{
+        //find Dr by doctorId
+        Optional<Doctor> optionalDoctor=doctorRepositoryobj.findById(associateDoctorRequest.getDoctorId());
+        if(optionalDoctor==null) {
+            throw new Exception("Dr Not found!");
+        }
+
+        //find Centre by CentreId
+        Optional<VaccinationCentre> optionalVaccinationCentre=vaccinationCentreRepositoryObj.findById(associateDoctorRequest.getCentreId());
+        if(optionalVaccinationCentre==null){
+            throw new Exception("Centre Not Found!");
+        }
+
+        //if dr found get that dr entity
+        Doctor doctor=optionalDoctor.get();
+
+        //if centre found get centre Enitity
+        VaccinationCentre vaccinationCentre=optionalVaccinationCentre.get();
+
+        if(doctor.getVaccinationCentre()!=null){
+            throw new Exception("Already associated!");
+        }
+
+        //set centre with dr entity
+        doctor.setVaccinationCentre(vaccinationCentre);
+
+        vaccinationCentre.getDoctorList().add(doctor);
+        vaccinationCentreRepositoryObj.save(vaccinationCentre);
+
+        return doctor.getName()+" associated with "+vaccinationCentre.getCentreName()+" Successfully!";
     }
 }

@@ -58,4 +58,13 @@ public class UserService {
         return "Email Updated Successfully!";
 
     }
+
+    public User getUserByEmail(String email) throws Exception{
+        User findUser=userRepositoryObj.findByEmailId(email);
+        if(findUser==null){
+            throw new Exception("invalid Email,User Not Found!");
+        }
+        return findUser;
+
+    }
 }

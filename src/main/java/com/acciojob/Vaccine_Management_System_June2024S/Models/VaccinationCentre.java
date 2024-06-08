@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +22,11 @@ public class VaccinationCentre {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer centreId;
 
-    private String openingTime;
+    private String centreName;
 
-    private String closingTime;
+    private Time openingTime;
+
+    private Time closingTime;
 
     private String address;
 

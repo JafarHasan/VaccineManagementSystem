@@ -1,13 +1,16 @@
 package com.acciojob.Vaccine_Management_System_June2024S.Controller;
 
 import com.acciojob.Vaccine_Management_System_June2024S.Requests.AddDoctorRequest;
-import com.acciojob.Vaccine_Management_System_June2024S.Requests.AssociateDoctorRequest;
+import com.acciojob.Vaccine_Management_System_June2024S.Requests.AssociateDoctorAndCentreRequest;
 import com.acciojob.Vaccine_Management_System_June2024S.Requests.UpdateDoctorName;
 import com.acciojob.Vaccine_Management_System_June2024S.Service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("doctor")
@@ -33,7 +36,7 @@ public class DoctorController {
     }
 
     @PutMapping("associateDoctorAndCentre")
-    public ResponseEntity<String> associateDoctorAndCentre(@RequestBody AssociateDoctorRequest associateDoctorRequest){
+    public ResponseEntity<String> associateDoctorAndCentre(@RequestBody AssociateDoctorAndCentreRequest associateDoctorRequest){
         try{
             String response=doctorServiceObj.associateDoctorAndCentre(associateDoctorRequest);
             return new ResponseEntity<>(response,HttpStatus.OK);
@@ -43,6 +46,20 @@ public class DoctorController {
         }
 
     }
+
+    @GetMapping("/listOfAllAssociatedDrWithCentreId")
+    public ResponseEntity<List<String>> findAllDrListAssociatedWithCentreId(@RequestParam("centreId")Integer centreId){
+        try{
+            List<String> drList=doctorServiceObj.listOfAllAssociatedDrById(centreId);
+            return new ResponseEntity<>(drList,HttpStatus.FOUND);
+        }
+        catch (Exception e) {
+            // Handle exceptions here
+            String errorMessage = "An error occurred: " + e.getMessage();
+            return new ResponseEntity<>(Collections.singletonList(errorMessage), HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 
 

@@ -6,6 +6,8 @@ import com.acciojob.Vaccine_Management_System_June2024S.Requests.AddCentreReques
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CentreService {
 
@@ -40,4 +42,6 @@ public class CentreService {
         vaccinationCentre=vaccinationCentreRepositoryObj.save(vaccinationCentre);
         return "Centre Added Successfully! Id is="+vaccinationCentre.getCentreId();
     }
+
+
 }

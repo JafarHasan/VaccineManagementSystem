@@ -26,9 +26,9 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private LocalDate Date; //format-> "YYYY-MM-DD"
+    private Date Date; //format-> "YYYY-MM-DD"
 
-    private LocalTime Time; //format-> "HH-MM-SS"
+    private Time Time; //format-> "HH-MM-SS"
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus appointmentStatus=AppointmentStatus.PENDING; //in the starting PENDING for all

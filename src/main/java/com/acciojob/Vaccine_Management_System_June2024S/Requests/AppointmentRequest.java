@@ -9,11 +9,9 @@ import java.util.Date;
 import java.util.Timer;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class AppointmentRequest {
 
-    private Integer dcotorId;
+    private Integer doctorId;
     private Integer userId;
     private Date appointmentDate;
     private Time appointmentTime;

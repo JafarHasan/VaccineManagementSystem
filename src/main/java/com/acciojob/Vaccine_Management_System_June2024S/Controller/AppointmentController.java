@@ -1,6 +1,7 @@
 package com.acciojob.Vaccine_Management_System_June2024S.Controller;
 
 import com.acciojob.Vaccine_Management_System_June2024S.Requests.AppointmentRequest;
+import com.acciojob.Vaccine_Management_System_June2024S.Requests.ChangeAppointmentDateRequest;
 import com.acciojob.Vaccine_Management_System_June2024S.Service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,17 @@ public class AppointmentController {
         }
         catch (Exception e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/changeDate")
+    public ResponseEntity<String> changeDateByAppointmentId(@RequestBody ChangeAppointmentDateRequest changeAppointmentDateRequestObj){
+        try{
+            String response=appointmentServiceObj.changeDateByAppointmentId(changeAppointmentDateRequestObj);
+            return new ResponseEntity<>(response,HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 

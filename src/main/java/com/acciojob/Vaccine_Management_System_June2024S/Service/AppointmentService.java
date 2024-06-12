@@ -8,12 +8,16 @@ import com.acciojob.Vaccine_Management_System_June2024S.Repository.AppointmentRe
 import com.acciojob.Vaccine_Management_System_June2024S.Repository.DoctorRepository;
 import com.acciojob.Vaccine_Management_System_June2024S.Repository.UserRepository;
 import com.acciojob.Vaccine_Management_System_June2024S.Requests.AppointmentRequest;
+import com.acciojob.Vaccine_Management_System_June2024S.Requests.ChangeAppointmentDateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -65,8 +69,8 @@ public class AppointmentService {
                 throw new Exception("your Appointment is already pending with ID :"+lastAppointment.getId());
             }
         }
-        //if everything if fine then we can book an appointment
-        //here is am using getter setter to build the bean of appointment i,e. without using @Builder annotaion
+        //if everything is fine then we can book an appointment
+        //here i am using getter setter to build the bean of appointment i,e. without using @Builder annotaion
         Appointment newAppointment=new Appointment();
         newAppointment.setDoctor(doctor);
         newAppointment.setUser(user);
@@ -93,12 +97,57 @@ public class AppointmentService {
                 "Dr Name: "+doctor.getName()+"\n\n"+
                 "Thank You";
         SimpleMailMessage mailMessage=new SimpleMailMessage();
-        mailMessage.setFrom("se.hasanjafar@gmail.com");
         mailMessage.setTo(user.getUserEmailId());
+        mailMessage.setFrom("se.hasanjafar@gmail.com");
         mailMessage.setSubject("Appointment Confirmation!");
         mailMessage.setText(body);
 
         javaMailSenderObj.send(mailMessage);
         return "Appointment has been booked with id: "+newAppointment.getId();
+    }
+    public String changeDateByAppointmentId(ChangeAppointmentDateRequest changeAppointmentDateRequestObj)throws Exception{
+
+        // Check if any of the required fields is null
+        if (changeAppointmentDateRequestObj.getUserId() == null ||
+                changeAppointmentDateRequestObj.getAppointmentId() == null ||
+                changeAppointmentDateRequestObj.getNewDate() == null) {
+            throw new Exception("One or more required fields are null. Please provide values for all fields.");
+        }
+
+        Integer userId=changeAppointmentDateRequestObj.getUserId();
+        Integer appointmentId=changeAppointmentDateRequestObj.getAppointmentId();
+        Date newDate=changeAppointmentDateRequestObj.getNewDate();
+
+        Optional<User> optionalUser=userRepositoryObj.findById(userId);
+        //if id is Invalid
+        if(optionalUser.isEmpty()){
+            throw new Exception("Invalid User Id,You can't change the Date!");
+        }
+
+        Optional<Appointment> optionalAppointment=appointmentRepositoryObj.findById(appointmentId);
+        if(optionalAppointment.isEmpty()){
+            throw new Exception("Invalid Appointment ID,No Appointment has been booked with this id before!");
+        }
+
+        User user=optionalUser.get();
+        Appointment appointment=optionalAppointment.get();
+
+        // Get today's date
+        LocalDate currentDate = LocalDate.now();
+        Date todatDate=Date.from(currentDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        if(newDate.before(appointment.getDate()) || ){
+            throw new Exception("The new date can not be before:"+appointment.getDate());
+        }
+
+        if(!appointment.getUser().equals(user)){
+            throw new Exception("you cant change the Date as you are not Authorized with this Appointment!");
+        }
+        if(user.getAppointmentList().get(user.getAppointmentList().size()-1).equals(AppointmentStatus.COMPLETED)){
+            throw new Exception("This Appointment has been Completed Already!");
+        }
+        appointment.setDate(newDate);
+        appointment=appointmentRepositoryObj.save(appointment);
+        return "Date has changed Successfully!\n New Date="+appointment.getDate();
     }
 }

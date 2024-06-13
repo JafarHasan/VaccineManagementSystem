@@ -31,6 +31,7 @@ public class Appointment {
     private Time Time; //format-> "HH-MM-SS"
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private AppointmentStatus appointmentStatus=AppointmentStatus.PENDING; //in the starting PENDING for all
 
     @JoinColumn

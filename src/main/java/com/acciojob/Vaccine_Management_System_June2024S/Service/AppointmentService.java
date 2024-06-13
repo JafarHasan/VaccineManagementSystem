@@ -87,7 +87,7 @@ public class AppointmentService {
         userRepositoryObj.save(user);
 
         //FOR SENDING CONFIRMATION THROUGH E-MAIL
-        String body = "Dear"+user.getUserName()+",\n\n" +
+        String body = "Dear "+user.getUserName()+",\n\n" +
                 "This is confirmation email to you that your appointment has been successfully booked. \n" +
                 "We are pleased to confirm that your preferred date and time have been secured.\n \n" +
                 "Appointment Details:\n\n" +
@@ -132,12 +132,15 @@ public class AppointmentService {
         User user=optionalUser.get();
         Appointment appointment=optionalAppointment.get();
 
+        //if user input newDate before today's date then it will be invalid
+        //but it will work on today date 2024-06-13 newDate 2024-06-13 but not before this date
         // Get today's date
         LocalDate currentDate = LocalDate.now();
+        //converting LocalDate to Date
         Date todatDate=Date.from(currentDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        if(newDate.before(appointment.getDate()) || ){
-            throw new Exception("The new date can not be before:"+appointment.getDate());
+        if(newDate.before(todatDate)){
+            throw new Exception("The new date can not be before:"+todatDate);
         }
 
         if(!appointment.getUser().equals(user)){
@@ -150,4 +153,55 @@ public class AppointmentService {
         appointment=appointmentRepositoryObj.save(appointment);
         return "Date has changed Successfully!\n New Date="+appointment.getDate();
     }
+
+    //Here i am not handling all Exceptions as above API
+    public  String cancelAppointmentById(Integer appointmentId,Integer userId) throws Exception{
+        //get appointment from appointment id;
+        Appointment appointment=appointmentRepositoryObj.findById(appointmentId).get();
+
+        //if already Cancelled;
+        if(appointment.getAppointmentStatus().equals(AppointmentStatus.CANCELLED)){
+            throw new Exception("Already Cancelled!");
+        }
+
+        //get user from user id
+        User user=userRepositoryObj.findById(userId).get();
+
+        //get dr.ID from appointment id
+        Integer doctorId=appointmentRepositoryObj.findDoctorIdByAppointmentId(appointmentId);
+        //from dr Id find Dr
+        Doctor doctor=doctorRepositoryObj.findById(doctorId).get();
+
+        //cancel this appointment from dr AppointmentList
+        for(Appointment app:doctor.getAppointmentList()){
+            if(app.getId().equals(appointmentId)){
+                app.setAppointmentStatus(AppointmentStatus.CANCELLED);
+                break;
+            }
+        }
+
+        //cancel from user appointmentList
+
+        for(Appointment app:user.getAppointmentList()) {
+            if (app.getId().equals(appointmentId)) {
+                app.setAppointmentStatus(AppointmentStatus.CANCELLED);
+                break;
+            }
+        }
+        //cancel this appointment from Db
+        appointment.setAppointmentStatus(AppointmentStatus.CANCELLED);
+
+        //save updated info of all three in DB
+        appointmentRepositoryObj.save(appointment);
+        doctorRepositoryObj.save(doctor);
+        userRepositoryObj.save(user);
+
+        return "Appointment has cancelled!";
+
+        //wrong Methods
+        //doctor.getAppointmentList().get(appointmentId).setAppointmentStatus(AppointmentStatus.CANCELLED);
+        //user.getAppointmentList().get(appointmentId).setAppointmentStatus(AppointmentStatus.CANCELLED);
+    }
+
+
 }

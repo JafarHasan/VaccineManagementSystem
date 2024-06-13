@@ -9,12 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("appointments")
+@RequestMapping("/appointments")
 public class AppointmentController {
 
     @Autowired
     private AppointmentService appointmentServiceObj;
-    @PostMapping("newBooking")
+    @PostMapping("/newBooking")
     private ResponseEntity<String> bookNewAppointment(@RequestBody AppointmentRequest appointmentRequest){
         try {
             String response = appointmentServiceObj.bookNewAppointment(appointmentRequest);
@@ -30,6 +30,19 @@ public class AppointmentController {
         try{
             String response=appointmentServiceObj.changeDateByAppointmentId(changeAppointmentDateRequestObj);
             return new ResponseEntity<>(response,HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/cancelled/{appointmentId}/{userId}")
+    public ResponseEntity<String> changeAppointmentById(@PathVariable("appointmentId")Integer appointmentId,
+                                                        @PathVariable("userId")Integer userId){
+        try{
+            String response= appointmentServiceObj.cancelAppointmentById(appointmentId,userId);
+            return new ResponseEntity<>(response,HttpStatus.OK);
+
         }
         catch (Exception e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);

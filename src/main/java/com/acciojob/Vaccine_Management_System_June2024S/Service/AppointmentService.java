@@ -161,7 +161,7 @@ public class AppointmentService {
 
         //if already Cancelled;
         if(appointment.getAppointmentStatus().equals(AppointmentStatus.CANCELLED)){
-            throw new Exception("Already Cancelled!");
+            throw new Exception("Its Already Cancelled before!");
         }
 
         //get user from user id

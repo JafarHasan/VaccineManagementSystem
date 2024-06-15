@@ -7,8 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.security.PrivateKey;
-import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Table
@@ -25,7 +24,7 @@ public class Dose {
     @Column(unique = true)//unique key
     private String doseNo;
 
-    private LocalDate doseDate;
+    private Date doseDate;
 
     @JoinColumn(name="userId")
     @OneToOne //one dose taken by -> one user

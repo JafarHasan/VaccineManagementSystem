@@ -36,7 +36,8 @@ public class DoseService {
         //get appointment
         Appointment appointment=appointmentOpt.get();
 
-        //if Date is not matched with appointment Date or time has passed
+        //if Date is not matched with appointment Date or time has not started yet
+        //we can't proceed an appointment at 2PM of before 3PM (if Appointment time is 3PM)
         if(appointment.getDate().compareTo(Date.valueOf(LocalDate.now()))!=0 && appointment.getTime().compareTo(Time.valueOf(LocalTime.now())) > 0){
             throw new Exception("Error! Your appointment date is : "+appointment.getDate()+"\n or your time has not started yet");
         }
